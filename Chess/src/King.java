@@ -7,7 +7,13 @@ public class King extends Piece {
     }
     void validMoves() {}
 
-
+    @Override
+    public String toString() {
+        String colour;
+        if (this.white) colour = "W";
+        else colour = "B";
+        return colour + " K";
+    }
 
 
 }

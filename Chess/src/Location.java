@@ -6,9 +6,11 @@ public class Location {
     Location(char column, int row) {
         this.row = row;
         this.column = column;
+        this.piece = new Piece();
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return this.column + "," + this.row;
+    }
 }
