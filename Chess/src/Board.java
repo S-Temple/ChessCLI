@@ -72,7 +72,7 @@ public class Board {
         }
     }
 
-    // add String Builder to improve performance
+    // TODO: add String Builder to improve performance
     @Override
     public String toString() {
         String status = "  | a || b || c || d || e || f || g || h |\n  |--------------------------------------|";
@@ -106,6 +106,8 @@ public class Board {
             return false;
         }
 
+        // TODO: check if other pieces are in the way
+
         // check if piece at locDest
         if (board[destCol - 97][destRow - 1].piece.alive){
             // is piece other colour?
@@ -117,7 +119,7 @@ public class Board {
 
         // kill piece at dest
         board[destCol - 97][destRow - 1].piece.alive = false;
-        // TODO: add if(alive then new piece otherwise swap)
+        // TODO: add if(alive then new piece otherwise swap references)
         board[col - 97][row - 1].piece = new Piece();
         board[destCol - 97][destRow - 1].piece = selected;
         return true;
