@@ -1,12 +1,16 @@
 public class Location {
-    private int row;
-    private char column;
+    public int row;
+    public char column;
     Piece piece;
 
     Location(char column, int row) {
         this.row = row;
         this.column = column;
         this.piece = new Piece();
+    }
+
+    boolean validMove(char colDest, int rowDest){
+        return this.piece.validMove(this.column , this.row, colDest, rowDest);
     }
 
     @Override

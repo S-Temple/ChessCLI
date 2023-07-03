@@ -12,7 +12,9 @@ class Piece {
         this.white = white;
 
     }
-    void validMoves() {}
+    boolean validMove(char col, int row, char colDest, int rowDest) {
+        return false;
+    }
 
     @Override
     public String toString() {

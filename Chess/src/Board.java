@@ -1,5 +1,16 @@
 public class Board {
-
+/*
+  | a || b || c || d || e || f || g || h |
+  |--------------------------------------|
+7 |B R||B H||B B||B Q||B K||B B||B H||B R|
+6 |B P||B P||B P||B P||B P||B P||B P||B P|
+5 |   ||   ||   ||   ||   ||   ||   ||   |
+4 |   ||   ||   ||   ||   ||   ||   ||   |
+3 |   ||   ||   ||   ||   ||   ||   ||   |
+2 |   ||   ||   ||   ||   ||   ||   ||   |
+1 |W P||W P||W P||W P||W P||W P||W P||W P|
+0 |W R||W H||W B||W Q||W K||W B||W H||W R|
+*/
 
     Location[][] board;
 
@@ -61,11 +72,12 @@ public class Board {
         }
     }
 
+    // add String Builder to improve performance
     @Override
     public String toString() {
         String status = "  | a || b || c || d || e || f || g || h |\n  |--------------------------------------|";
-        for (int row = 0; row < 8; row++){
-            status += "\n" + (8 - row) + " ";
+        for (int row = 7; row >= 0; row--){
+            status += "\n" + (row + 1) + " ";
             for (int col = 0; col < 8; col++){
                 status += "|" + board[col][row].piece.toString() + "|";
             }
@@ -75,19 +87,39 @@ public class Board {
 
     public boolean takeTurn(boolean white, char col, int row, char destCol, int destRow) {
         // check if there is a piece at location
-        if(!board[Character.valueOf(col) - 97][row - 1].piece.alive) {
+        Piece selected = board[col - 97][row - 1].piece;
+        if(!selected.alive) {
             System.out.println("no piece at location");
             return false;
         }
         // check if correct colour
-        else if (board[Character.valueOf(col) - 97][row - 1].piece.white == white) {
+        else if (selected.white != white) {
             System.out.println("incorrect colour");
             return false;
         }
 
+        // no need to check if dest on board as CLI take care of user input.
 
-        //check valid move
-        // make move
+        // piece can reach?
+        if (!board[col - 97][row - 1].validMove(destCol, destRow)){
+            System.out.println("piece cannot reach location");
+            return false;
+        }
+
+        // check if piece at locDest
+        if (board[destCol - 97][destRow - 1].piece.alive){
+            // is piece other colour?
+            if (board[destCol - 97][destRow - 1].piece.white == white) {
+                System.out.println("Same Team!");
+                return false;
+            }
+        }
+
+        // kill piece at dest
+        board[destCol - 97][destRow - 1].piece.alive = false;
+        // TODO: add if(alive then new piece otherwise swap)
+        board[col - 97][row - 1].piece = new Piece();
+        board[destCol - 97][destRow - 1].piece = selected;
         return true;
     }
 }
