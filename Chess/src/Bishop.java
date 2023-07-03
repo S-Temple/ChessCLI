@@ -1,9 +1,8 @@
 public class Bishop extends Piece{
-    boolean white = true;
-    boolean alive = true;
+
 
     Bishop(boolean white){
-        this.white = white;
+        super(true, white);
     }
     void validMoves() {}
 

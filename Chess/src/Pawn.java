@@ -1,9 +1,7 @@
 public class Pawn extends Piece{
-    boolean white;
-    boolean alive = true;
 
     Pawn(boolean white){
-        this.white = white;
+        super(true, white);
     }
     void validMoves() {}
 

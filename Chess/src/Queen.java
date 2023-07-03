@@ -1,9 +1,7 @@
 public class Queen extends Piece{
-    boolean white = true;
-    boolean alive = true;
 
     Queen(boolean white){
-        this.white = white;
+        super(true, white);
     }
     void validMoves() {}
 

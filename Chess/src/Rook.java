@@ -1,9 +1,7 @@
 public class Rook extends Piece{
-    boolean white;
-    boolean alive = true;
 
     Rook(boolean white){
-        this.white = white;
+        super(true, white);
     }
     void validMoves() {}
 

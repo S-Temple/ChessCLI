@@ -1,9 +1,7 @@
 public class King extends Piece {
-    boolean white = true;
-    boolean alive = true;
 
     King(boolean white){
-        this.white = white;
+        super(true, white);
     }
     void validMoves() {}
 

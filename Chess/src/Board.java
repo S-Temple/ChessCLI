@@ -1,8 +1,5 @@
 public class Board {
 
-    // checks for kill
-    // monitor turns
-    // print board status?
 
     Location[][] board;
 
@@ -29,7 +26,7 @@ public class Board {
             for (int row = 0; row < 2; row++) {
                 // create and set white pawns
                 if (row == 1) {
-                    board[col][row].piece = new Pawn(true);
+                     board[col][row].piece = new Pawn(true);
                 }
 
                 // row == 0 set rest of white pieces
@@ -74,5 +71,23 @@ public class Board {
             }
         }
         return status;
+    }
+
+    public boolean takeTurn(boolean white, char col, int row, char destCol, int destRow) {
+        // check if there is a piece at location
+        if(!board[Character.valueOf(col) - 97][row - 1].piece.alive) {
+            System.out.println("no piece at location");
+            return false;
+        }
+        // check if correct colour
+        else if (board[Character.valueOf(col) - 97][row - 1].piece.white == white) {
+            System.out.println("incorrect colour");
+            return false;
+        }
+
+
+        //check valid move
+        // make move
+        return true;
     }
 }
