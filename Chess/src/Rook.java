@@ -16,6 +16,6 @@ public class Rook extends Piece{
         String colour;
         if (this.white) colour = "W";
         else colour = "B";
-        return colour + " R";
+        return colour + "R";
     }
 }

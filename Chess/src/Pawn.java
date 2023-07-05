@@ -6,7 +6,14 @@ public class Pawn extends Piece{
     }
     @Override
     boolean validMove(char col, int row, char colDest, int rowDest) {
-        if (firstMove && (rowDest - row == 2) && (colDest == col)) return true;
+        if (white && firstMove && (rowDest - row == 2) && (colDest == col)) {
+            firstMove = false;
+            return true;
+        }
+        if (!white && firstMove && (rowDest - row == -2) && (colDest == col)) {
+            firstMove = false;
+            return true;
+        }
 
         if(white && (rowDest - row == 1) && (Math.abs(colDest - col) < 2)){
             return true;
@@ -21,6 +28,6 @@ public class Pawn extends Piece{
         String colour;
         if (this.white) colour = "W";
         else colour = "B";
-        return colour + " P";
+        return colour + "P";
     }
 }
