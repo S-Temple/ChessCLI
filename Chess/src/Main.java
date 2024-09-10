@@ -1,14 +1,23 @@
 public class Main {
     public static void main(String[] args) {
+
+        // chessCLI object for input validation and system in operations
         ChessCLI input = new ChessCLI();
-        System.out.println("Play game?");
-        // print instructions
+
+        // TODO add menu if needed... maybe two player or ai player game
+        System.out.println("NEW GAME/n------------------------------");
+
         Board game = new Board();
+        // print game board state
         System.out.println(game);
+
         //break on win, quit
         boolean successful = false;
+
+        // Game loop/flow control
         while (true){
             successful = false;
+
             // white turn
             while(!successful) {
                 input.print("WHITE move; select a piece\n");

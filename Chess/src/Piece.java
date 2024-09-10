@@ -12,6 +12,7 @@ class Piece {
         this.white = white;
 
     }
+
     boolean validMove(char col, int row, char colDest, int rowDest) {
         return false;
     }

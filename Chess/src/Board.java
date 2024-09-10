@@ -1,6 +1,15 @@
 import java.util.StringJoiner;
 
+/**
+ * Manages state of board
+ * All movement has to be validated on a board level then a piece level before actually changing state
+ * For example a board level check is to see if location is a valid area of board and
+ * a piece level check is to see if pawn is moving more then 1 space
+ *
+ * Provides methods for printing state and changing state
+ */
 public class Board {
+
 /*
   | a || b || c || d || e || f || g || h |
   |--------------------------------------|
@@ -13,12 +22,15 @@ public class Board {
 1 |W P||W P||W P||W P||W P||W P||W P||W P|
 0 |W R||W H||W B||W Q||W K||W B||W H||W R|
 */
-
     Location[][] board;
 
+    /**
+     * Constructor creates array of 8 arrays of 8 Locations
+     * Uses reset board to populate pieces
+     */
     Board() {
 
-        //create board
+        // create board
         board = new Location[8][8];
 
         // for ASCII chars a-h
@@ -28,11 +40,13 @@ public class Board {
             }
         }
 
-        this.resetBoard();
+        this.setBoard();
     }
 
-
-    public void resetBoard() {
+    /**
+     * Populates board with starting positions of pieces
+     */
+    public void setBoard() {
         // for columns 1-8
         for (int col = 0; col < 8; col++) {
             // for rows 1-2 (White set up)
@@ -55,6 +69,7 @@ public class Board {
                     } else board[col][row].piece = new King(true);
                 }
             }
+
             // black set up
             for (int row = 6; row < 8; row++) {
                 if (row == 6) {
@@ -74,6 +89,10 @@ public class Board {
         }
     }
 
+    /**
+     * Formats board state into a printable string
+     * @return      String representing the board state
+     */
     @Override
     public String toString() {
         StringJoiner status = new StringJoiner("\n");
@@ -90,6 +109,17 @@ public class Board {
         return status.toString();
     }
 
+    /**
+     * Logic for attempting to move a chess piece
+     * mostly validation if move is legal withing rules of chess
+     *
+     * @param  white boolean value for what player color if currently attempting a turn
+     * @param  col the char representing the column a piece for selection is in
+     * @param  row the int representing the row a piece for selection is in
+     * @param  destCol the char representing the col location the selected piece is attempting to move to
+     * @param  destRow the int representing the row location the selected piece is attempting to move to
+     * @return      boolean value representing if the attempted move was successful or not
+     */
     public boolean takeTurn(boolean white, char col, int row, char destCol, int destRow) {
         // check if there is a piece at location
         Piece selected = board[col - 97][row - 1].piece;
@@ -103,20 +133,21 @@ public class Board {
             return false;
         }
 
-        // no need to check if dest on board as CLI take care of user input.
+        // no need to check if dest on board as ChessCLI validates all user input.
+        // TODO maybe add checks anyway
 
-        // piece can reach?
-        if (!board[col - 97][row - 1].validMove(destCol, destRow)) {
+        // check if valid move for selected piece
+        if (!selected.validMove(col,row,destCol, destRow)) {
             System.out.println("piece cannot reach location");
             return false;
         }
 
         // TODO: check if other pieces are between destination and start return false if so
+        // check class of selected
         // check up or down rook/queen
+        // check dia for bishop
         if (destCol - col == 0) {
-
             int moves = destRow - row;
-
             // moving down
             if (moves < 0) {
                 for (int i = -1; i > moves; i--) {

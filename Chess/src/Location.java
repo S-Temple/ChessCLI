@@ -9,10 +9,6 @@ public class Location {
         this.piece = new Piece();
     }
 
-    boolean validMove(char colDest, int rowDest){
-        return this.piece.validMove(this.column , this.row, colDest, rowDest);
-    }
-
     @Override
     public String toString() {
         return this.column + "," + this.row;
