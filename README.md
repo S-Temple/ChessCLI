@@ -14,3 +14,6 @@ This design allows each type of peice to handle what are valid moves for themsel
 2. The Board is essentially a array of arrays, 8 by 8 of Piece(s) with methods for resetting the board and managing general state of the board. As the Board monitors state this is where checks for collisions between peices occur.
 
 3. The entrypoint Main controls game flow and instantiates the ChesseCLI class that manages system in calls and validates inputs.
+
+Example of Game in play:
+![System.out game in play](./Images/StartGameExample.png)

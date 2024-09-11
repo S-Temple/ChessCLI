@@ -1,32 +1,34 @@
 import java.util.StringJoiner;
 
 /**
- * Manages state of board
- * All movement has to be validated on a board level then a piece level before actually changing state
- * For example a board level check is to see if location is a valid area of board and
- * a piece level check is to see if pawn is moving more then 1 space
+ * Manages the state of the chessboard.
+ * <p>
+ * The board manages the movement of pieces by validating moves at both the board and piece level.
+ * It ensures moves are within the boundaries of the board and adhere to the rules for each piece type.
+ * It also provides methods to initialize the board, print its current state, and attempt moves.
  *
- * Provides methods for printing state and changing state
+ * EXAMPLE: initial state printed to terminal
+ * First character represents Black 'B' or White 'W'
+ * Second character represents the type of piece Pawn, Rook, Bishop, Horse(Knight), King, and Queen
+ *   | a || b || c || d || e || f || g || h |
+ *   |--------------------------------------|
+ * 7 |B R||B H||B B||B Q||B K||B B||B H||B R|
+ * 6 |B P||B P||B P||B P||B P||B P||B P||B P|
+ * 5 |   ||   ||   ||   ||   ||   ||   ||   |
+ * 4 |   ||   ||   ||   ||   ||   ||   ||   |
+ * 3 |   ||   ||   ||   ||   ||   ||   ||   |
+ * 2 |   ||   ||   ||   ||   ||   ||   ||   |
+ * 1 |W P||W P||W P||W P||W P||W P||W P||W P|
+ * 0 |W R||W H||W B||W Q||W K||W B||W H||W R|
  */
 public class Board {
 
-/*
-  | a || b || c || d || e || f || g || h |
-  |--------------------------------------|
-7 |B R||B H||B B||B Q||B K||B B||B H||B R|
-6 |B P||B P||B P||B P||B P||B P||B P||B P|
-5 |   ||   ||   ||   ||   ||   ||   ||   |
-4 |   ||   ||   ||   ||   ||   ||   ||   |
-3 |   ||   ||   ||   ||   ||   ||   ||   |
-2 |   ||   ||   ||   ||   ||   ||   ||   |
-1 |W P||W P||W P||W P||W P||W P||W P||W P|
-0 |W R||W H||W B||W Q||W K||W B||W H||W R|
-*/
+    // 8x8 chess board represented as a 2D array of Piece objects
     Piece[][] board;
 
     /**
-     * Constructor creates array of 8 arrays of 8 Locations
-     * Uses reset board to populate pieces
+     * Constructor initializes an 8x8 board and populates it with pieces in their starting positions.
+     * Calls {@link #setBoard()} to set up the initial state of the game.
      */
     Board() {
 
@@ -44,7 +46,7 @@ public class Board {
     }
 
     /**
-     * Populates board with starting positions of pieces
+     * Populates the board with the initial chess pieces in their starting positions.
      */
     public void setBoard() {
         // for columns 1-8
@@ -90,8 +92,12 @@ public class Board {
     }
 
     /**
-     * Formats board state into a printable string
-     * @return      String representing the board state
+     * Formats the current state of the board into a string for printing.
+     * <p>
+     * The board is represented as a grid, where rows and columns are labeled,
+     * and each cell contains a chess piece or is empty.
+     *
+     * @return A string representing the board state.
      */
     @Override
     public String toString() {
@@ -110,29 +116,35 @@ public class Board {
     }
 
     /**
-     * Logic for attempting to move a chess piece
-     * mostly validation if move is legal withing rules of chess
+     * Attempts to move a piece on the board, checking if the move is valid according to the rules of chess.
+     * <p>
+     * It first validates that the piece exists, is the correct color, and that the destination is valid.
+     * Then, it checks for collisions and special movement rules (e.g., for pawns and knights).
+     * If the move is valid, the piece is moved, and the method returns {@code true}.
      *
-     * @param  white boolean value for what player color if currently attempting a turn
-     * @param  col the char representing the column a piece for selection is in
-     * @param  row the int representing the row a piece for selection is in
-     * @param  destCol the char representing the col location the selected piece is attempting to move to
-     * @param  destRow the int representing the row location the selected piece is attempting to move to
-     * @return      boolean value representing if the attempted move was successful or not
+     * @param white    A boolean indicating whether it's white's turn.
+     * @param col      The character representing the current column of the piece.
+     * @param row      The integer representing the current row of the piece.
+     * @param destCol  The character representing the destination column.
+     * @param destRow  The integer representing the destination row.
+     * @return {@code true} if the move was successful, {@code false} otherwise.
      */
     public boolean takeTurn(boolean white, char col, int row, char destCol, int destRow) {
-        // check if there is an alive piece at selected location
+        // Convert char columns 'a'-'h' to indices 0-7
         int colIndex = col-97;
         int destColIndex = destCol-97;
         int rowIndex = row-1;
         int destRowIndex = destRow-1;
 
         Piece selected = board[colIndex][rowIndex];
+
+        // Check if there's an active piece at the selected location
         if (!selected.alive) {
             System.out.println("no piece at location");
             return false;
         }
-        // check if correct colour
+
+        // Check if it's the correct color's turn
         else if (selected.white != white) {
             System.out.println("incorrect colour");
             return false;
@@ -147,7 +159,8 @@ public class Board {
             return false;
         }
 
-        // collision checks
+
+        // Handle collision checks based on piece type
         int vertical = destRowIndex - rowIndex;
         int horizontal = destColIndex - colIndex;
 
@@ -221,9 +234,9 @@ public class Board {
             }
         }
 
-        // check if piece at locDest
+        // check if a piece exists at destination location
         if (board[destColIndex][destRowIndex].alive) {
-            // is piece enemy colour?
+            // is friendly fire?
             if (board[destCol - 97][destRow - 1].white == white) {
                 System.out.println("Same Team!");
                 return false;
@@ -243,14 +256,33 @@ public class Board {
         // empty current location and place selected at destination
         board[colIndex][rowIndex] = new Piece();
         board[destColIndex][destRowIndex] = selected;
+
+        // handle special case pawn first move
+        if (selected instanceof Pawn && ((Pawn) selected).firstMove) {
+            ((Pawn) selected).removeFirstMove();
+        }
         return true;
     }
 
+    /**
+     * Checks for collisions when attempting a diagonal move on the board.
+     * This method verifies if any pieces are blocking the path between the
+     * current position and the destination position for pieces like the
+     * Bishop and Queen that move diagonally.
+     *
+     * @param colIndex   The column index of the current piece.
+     * @param rowIndex   The row index of the current piece.
+     * @param vertical   The vertical displacement (difference in rows) between the current position and the destination.
+     * @param horizontal The horizontal displacement (difference in columns) between the current position and the destination.
+     * @return           {@code true} if the path is clear for the diagonal move, {@code false} if a piece is blocking the path.
+     */
     private boolean goodDiagonalMove(int colIndex, int rowIndex, int vertical, int horizontal) {
         int vertIncrement = vertical/Math.abs(vertical);
         int horIncrement = horizontal/Math.abs(horizontal);
-        for (int vertVal = vertIncrement, horVal =horIncrement; vertVal != vertical && horVal != horizontal; vertVal += vertIncrement, horVal += horIncrement){
-            if (board[colIndex+horVal][rowIndex+vertVal].alive) {
+        for (int vertOffset = vertIncrement, horizOffset = horIncrement;
+             vertOffset != vertical && horizOffset != horizontal;
+             vertOffset += vertIncrement, horizOffset += horIncrement) {
+            if (board[colIndex+horizOffset][rowIndex+vertOffset].alive) {
                 System.out.println("piece blocking path");
                 return false;
             }
@@ -258,6 +290,17 @@ public class Board {
         return true;
     }
 
+    /**
+     * Checks for collisions when attempting an orthogonal (horizontal or vertical) move on the board.
+     * This method verifies if any pieces are blocking the path between the current position and the
+     * destination position for pieces like the Rook and Queen that move horizontally or vertically.
+     *
+     * @param colIndex   The column index of the current piece.
+     * @param rowIndex   The row index of the current piece.
+     * @param vertical   The vertical displacement (difference in rows) between the current position and the destination.
+     * @param horizontal The horizontal displacement (difference in columns) between the current position and the destination.
+     * @return           {@code true} if the path is clear for the orthogonal move, {@code false} if a piece is blocking the path.
+     */
     private boolean goodOrthogonalMove(int colIndex, int rowIndex, int vertical, int horizontal) {
         if(vertical < 0){ // moving down
             for (int i = 1; i < Math.abs(vertical); i++){
