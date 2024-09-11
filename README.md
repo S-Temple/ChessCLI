@@ -16,4 +16,5 @@ This design allows each type of peice to handle what are valid moves for themsel
 3. The entrypoint Main controls game flow and instantiates the ChesseCLI class that manages system in calls and validates inputs.
 
 Example of Game in play:
+
 ![System.out game in play](./Images/StartGameExample.png)
