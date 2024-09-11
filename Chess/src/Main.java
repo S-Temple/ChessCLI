@@ -5,7 +5,7 @@ public class Main {
         ChessCLI input = new ChessCLI();
 
         // TODO add menu if needed... maybe two player or ai player game
-        System.out.println("NEW GAME/n------------------------------");
+        System.out.println("NEW GAME\n------------------------------");
 
         Board game = new Board();
         // print game board state
@@ -23,7 +23,7 @@ public class Main {
                 input.print("WHITE move; select a piece\n");
                 successful = game.takeTurn(true, input.getUserChar("Please enter column of piece"), input.getUserInt("Please enter row of piece"),
                                             input.getUserChar("Please enter destination column"), input.getUserInt("Please enter destination row"));
-                if (!successful) input.print("Not valid please try again\n\n");
+                if (!successful) input.print("Not valid move please try again\n\n");
             }
 
             System.out.println(game);
@@ -32,7 +32,7 @@ public class Main {
                 input.print("BLACK move; select a piece\n");
                 successful = game.takeTurn(false, input.getUserChar("Please enter column of piece"), input.getUserInt("Please enter row of piece"),
                         input.getUserChar("Please enter destination column"), input.getUserInt("Please enter destination row"));
-                if (!successful) input.print("Not valid please try again\n\n");
+                if (!successful) input.print("Not valid move please try again\n\n");
             }
             System.out.println(game);
         }

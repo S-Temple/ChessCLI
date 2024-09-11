@@ -1,9 +1,13 @@
 public class Pawn extends Piece{
 
-    boolean firstMove = true;
+    boolean firstMove;
+
     Pawn(boolean white){
         super(true, white);
+        firstMove = true;
     }
+
+    // TODO: fix firstmove
     @Override
     boolean validMove(char col, int row, char colDest, int rowDest) {
         if (white && firstMove && (rowDest - row == 2) && (colDest == col)) {

@@ -22,7 +22,7 @@ public class Board {
 1 |W P||W P||W P||W P||W P||W P||W P||W P|
 0 |W R||W H||W B||W Q||W K||W B||W H||W R|
 */
-    Location[][] board;
+    Piece[][] board;
 
     /**
      * Constructor creates array of 8 arrays of 8 Locations
@@ -31,12 +31,12 @@ public class Board {
     Board() {
 
         // create board
-        board = new Location[8][8];
+        board = new Piece[8][8];
 
         // for ASCII chars a-h
         for (int col = 0; col < 8; col++) {
             for (int row = 0; row < 8; row++) {
-                board[col][row] = new Location((char) (col + 97), row + 1);
+                board[col][row] = new Piece();
             }
         }
 
@@ -53,37 +53,37 @@ public class Board {
             for (int row = 0; row < 2; row++) {
                 // create and set white pawns
                 if (row == 1) {
-                    board[col][row].piece = new Pawn(true);
+                    board[col][row] = new Pawn( true);
                 }
 
                 // row == 0 set rest of white pieces
                 else {
                     if (col == 0 | col == 7) {
-                        board[col][row].piece = new Rook(true);
+                        board[col][row] = new Rook(true);
                     } else if (col == 1 | col == 6) {
-                        board[col][row].piece = new Horse(true);
+                        board[col][row] = new Horse(true);
                     } else if (col == 2 | col == 5) {
-                        board[col][row].piece = new Bishop(true);
+                        board[col][row] = new Bishop(true);
                     } else if (col == 3) {
-                        board[col][row].piece = new Queen(true);
-                    } else board[col][row].piece = new King(true);
+                        board[col][row] = new Queen(true);
+                    } else board[col][row] = new King(true);
                 }
             }
 
             // black set up
             for (int row = 6; row < 8; row++) {
                 if (row == 6) {
-                    board[col][row].piece = new Pawn(false);
+                    board[col][row] = new Pawn(false);
                 } else {
                     if (col == 0 | col == 7) {
-                        board[col][row].piece = new Rook(false);
+                        board[col][row] = new Rook(false);
                     } else if (col == 1 | col == 6) {
-                        board[col][row].piece = new Horse(false);
+                        board[col][row] = new Horse(false);
                     } else if (col == 2 | col == 5) {
-                        board[col][row].piece = new Bishop(false);
+                        board[col][row] = new Bishop(false);
                     } else if (col == 3) {
-                        board[col][row].piece = new Queen(false);
-                    } else board[col][row].piece = new King(false);
+                        board[col][row] = new Queen(false);
+                    } else board[col][row] = new King(false);
                 }
             }
         }
@@ -102,7 +102,7 @@ public class Board {
             StringBuilder rowString = new StringBuilder();
             rowString.append(row + 1).append(" ");
             for (int col = 0; col < 8; col++) {
-                rowString.append("|").append(board[col][row].piece.toString()).append("|");
+                rowString.append("|").append(board[col][row].toString()).append("|");
             }
             status.add(rowString.toString());
         }
@@ -121,8 +121,13 @@ public class Board {
      * @return      boolean value representing if the attempted move was successful or not
      */
     public boolean takeTurn(boolean white, char col, int row, char destCol, int destRow) {
-        // check if there is a piece at location
-        Piece selected = board[col - 97][row - 1].piece;
+        // check if there is an alive piece at selected location
+        int colIndex = col-97;
+        int destColIndex = destCol-97;
+        int rowIndex = row-1;
+        int destRowIndex = destRow-1;
+
+        Piece selected = board[colIndex][rowIndex];
         if (!selected.alive) {
             System.out.println("no piece at location");
             return false;
@@ -134,100 +139,181 @@ public class Board {
         }
 
         // no need to check if dest on board as ChessCLI validates all user input.
-        // TODO maybe add checks anyway
+        // TODO: maybe add bounds checks anyway?
 
-        // check if valid move for selected piece
+        // check if valid move for selected piece type
         if (!selected.validMove(col,row,destCol, destRow)) {
             System.out.println("piece cannot reach location");
             return false;
         }
 
-        // TODO: check if other pieces are between destination and start return false if so
-        // check class of selected
-        // check up or down rook/queen
-        // check dia for bishop
-        if (destCol - col == 0) {
-            int moves = destRow - row;
-            // moving down
-            if (moves < 0) {
-                for (int i = -1; i > moves; i--) {
-                    if (board[col - 97][row + i - 1].piece.alive) {
-                        System.out.println("Invalid move other piece(s) in the way");
-                        return false;
-                    }
-                }
-                // moving up
-            } else {
-                for (int i = 1; i < moves; i++) {
-                    if (board[col - 97][row + i - 1].piece.alive) {
-                        System.out.println("Invalid move other piece(s) in the way");
-                        return false;
-                    }
-                }
-            }
-        }
+        // collision checks
+        int vertical = destRowIndex - rowIndex;
+        int horizontal = destColIndex - colIndex;
 
-        // check right or left queen/rook
-        if (destRow - row == 0) {
-            int moves = destCol - col;
-
-            // moving left
-            if (moves < 0) {
-                for (int i = -1; i > moves; i--) {
-                    if (board[col + i - 97][row - 1].piece.alive) {
-                        System.out.println("Invalid move other piece(s) in the way");
-                        return false;
+        switch (selected.getClass().getName()) {
+            case "Horse", "King" -> {} // not possible to collide without attacking piece
+            case "Pawn" -> {
+                if(selected.white){
+                    // white increasing vertical val
+                    if(horizontal == 0) { // not a attack
+                        for(int i = 1; i <= vertical; i++){
+                            if(board[colIndex][rowIndex+i].alive) {
+                                System.out.println("piece blocking path");
+                                return false;
+                            }
+                        }
+                    } else { // attack move
+                        if(!board[destColIndex][destRowIndex].alive) {
+                            System.out.println("no piece for pawn to attack at location");
+                            return false;
+                        }
                     }
-                }
-                // moving right
-            } else {
-                for (int i = 1; i < moves; i++) {
-                    if (board[col + i - 97][row - 1].piece.alive) {
-                        System.out.println("Invalid move other piece(s) in the way");
-                        return false;
+                } else {
+                    // negative vertical movement
+                    if(horizontal == 0) { // not a attack
+                        for(int i = -1; i >= vertical; i--){
+                            if(board[colIndex][rowIndex+i].alive) {
+                                System.out.println("piece blocking path");
+                                return false;
+                            }
+                        }
+                    } else { // attack move
+                        if(!board[destColIndex][destRowIndex].alive) {
+                            System.out.println("no piece for pawn to attack at location");
+                            return false;
+                        }
                     }
                 }
             }
-        }
 
-        // check diagonal bishop/queen
-        if (Math.abs(destCol - col) == Math.abs(destRow - row)) {
-            // maybe way for two for loops where instead of ++/-- use (dest-source/(dest-source))
-            int colMovement = (destCol - col);
-            int colIncrementer = colMovement / Math.abs(colMovement);
-            colMovement = Math.abs(colMovement);
+            case "Rook" -> {
+                if(vertical < 0){ // moving down
+                    for (int i = 1; i < Math.abs(vertical); i++){
+                        if(board[colIndex][rowIndex-i].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if(vertical > 0){ // moving up
+                    for (int i = 1; i < vertical; i++){
+                        if(board[colIndex][rowIndex+i].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if (horizontal < 0) { // moving left
+                    for (int i = 1; i < Math.abs(horizontal); i++){
+                        if(board[colIndex-i][rowIndex].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if (horizontal > 0) {
+                    for (int i = 1; i < horizontal; i++){
+                        if(board[colIndex+i][rowIndex].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
 
-            int rowIncrementer = (destRow - row);
-            rowIncrementer = rowIncrementer / Math.abs(rowIncrementer);
-
-            for (int i = colIncrementer, j = rowIncrementer; Math.abs(i) < Math.abs(colMovement); i += colIncrementer, j += rowIncrementer) {
-                if (board[col + i - 97][row + j - 1].piece.alive) {
-                    System.out.println("Invalid move other piece(s) in the way");
+                } else {
+                    System.out.println("No movement for rook");
                     return false;
                 }
+            }
+
+            case "Bishop" -> {
+                if(Math.abs(vertical)==Math.abs(horizontal)){
+                    int vertIncrement = vertical/Math.abs(vertical);
+                    int horIncrement = horizontal/Math.abs(horizontal);
+                    for (int vertVal = vertIncrement, horVal =horIncrement; vertVal != vertical && horVal != horizontal; vertVal += vertIncrement, horVal += horIncrement){
+                        if (board[colIndex+horVal][rowIndex+vertVal].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+
+
+                } else {
+                    System.out.println("Invalid move");
+                    return false;
+                }
+            }
+
+            // TODO: Extract diagonal and rook tests to private member methods
+            case "Queen" -> {
+                if(Math.abs(vertical)==Math.abs(horizontal)){
+                    int vertIncrement = vertical/Math.abs(vertical);
+                    int horIncrement = horizontal/Math.abs(horizontal);
+                    for (int vertVal = vertIncrement, horVal =horIncrement; vertVal != vertical && horVal != horizontal; vertVal += vertIncrement, horVal += horIncrement){
+                        if (board[colIndex+horVal][rowIndex+vertVal].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if(vertical < 0){ // moving down
+                    for (int i = 1; i < Math.abs(vertical); i++){
+                        if(board[colIndex][rowIndex-i].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if(vertical > 0){ // moving up
+                    for (int i = 1; i < vertical; i++){
+                        if(board[colIndex][rowIndex+i].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if (horizontal < 0) { // moving left
+                    for (int i = 1; i < Math.abs(horizontal); i++){
+                        if(board[colIndex-i][rowIndex].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+                } else if (horizontal > 0) { // moving right
+                    for (int i = 1; i < horizontal; i++){
+                        if(board[colIndex+i][rowIndex].alive) {
+                            System.out.println("piece blocking path");
+                            return false;
+                        }
+                    }
+
+                } else {
+                    System.out.println("No movement for Queen");
+                    return false;
+                }
+            }
+            default ->{
+                System.out.println("Selected unexpected class type");
+                return false;
             }
         }
 
         // check if piece at locDest
-        if (board[destCol - 97][destRow - 1].piece.alive) {
-            // is piece other colour?
-            if (board[destCol - 97][destRow - 1].piece.white == white) {
+        if (board[destColIndex][destRowIndex].alive) {
+            // is piece enemy colour?
+            if (board[destCol - 97][destRow - 1].white == white) {
                 System.out.println("Same Team!");
                 return false;
             }
         }
 
-
-        if (board[destCol - 97][destRow - 1].piece.alive) {
-            if (board[destCol - 97][destRow - 1].piece instanceof King) {
+        // Check win condition (King Killed)
+        if (board[destColIndex][destRowIndex].alive) {
+            if (board[destColIndex][destRowIndex] instanceof King) {
                 if (white) System.out.println("WHITE WINS");
                 else System.out.println("BLACK WINS");
+                // TODO: return to menu?
                 System.exit(0);
             }
-            board[destCol - 97][destRow - 1].piece = new Piece();
         }
-        board[col - 97][row - 1].piece = new Piece();
-        board[destCol - 97][destRow - 1].piece = selected;
+
+        // empty current location and place selected at destination
+        board[colIndex][rowIndex] = new Piece();
+        board[destColIndex][destRowIndex] = selected;
         return true;
     }
 }
