@@ -188,102 +188,31 @@ public class Board {
             }
 
             case "Rook" -> {
-                if(vertical < 0){ // moving down
-                    for (int i = 1; i < Math.abs(vertical); i++){
-                        if(board[colIndex][rowIndex-i].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-                } else if(vertical > 0){ // moving up
-                    for (int i = 1; i < vertical; i++){
-                        if(board[colIndex][rowIndex+i].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-                } else if (horizontal < 0) { // moving left
-                    for (int i = 1; i < Math.abs(horizontal); i++){
-                        if(board[colIndex-i][rowIndex].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-                } else if (horizontal > 0) {
-                    for (int i = 1; i < horizontal; i++){
-                        if(board[colIndex+i][rowIndex].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-
-                } else {
+                if (!goodOrthogonalMove(colIndex,rowIndex,vertical,horizontal)) {
                     System.out.println("No movement for rook");
                     return false;
                 }
             }
 
             case "Bishop" -> {
-                if(Math.abs(vertical)==Math.abs(horizontal)){
-                    int vertIncrement = vertical/Math.abs(vertical);
-                    int horIncrement = horizontal/Math.abs(horizontal);
-                    for (int vertVal = vertIncrement, horVal =horIncrement; vertVal != vertical && horVal != horizontal; vertVal += vertIncrement, horVal += horIncrement){
-                        if (board[colIndex+horVal][rowIndex+vertVal].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
+                if(!goodDiagonalMove(colIndex,rowIndex,vertical,horizontal)) {
+                        System.out.println("No movement for Bishop");
+                        return false;
 
-
-                } else {
-                    System.out.println("Invalid move");
-                    return false;
                 }
             }
 
-            // TODO: Extract diagonal and rook tests to private member methods
             case "Queen" -> {
-                if(Math.abs(vertical)==Math.abs(horizontal)){
-                    int vertIncrement = vertical/Math.abs(vertical);
-                    int horIncrement = horizontal/Math.abs(horizontal);
-                    for (int vertVal = vertIncrement, horVal =horIncrement; vertVal != vertical && horVal != horizontal; vertVal += vertIncrement, horVal += horIncrement){
-                        if (board[colIndex+horVal][rowIndex+vertVal].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
+                if(Math.abs(vertical)==Math.abs(horizontal)) {
+                    if(!goodDiagonalMove(colIndex,rowIndex,vertical,horizontal)) {
+                        System.out.println("No movement for Queen");
+                        return false;
                     }
-                } else if(vertical < 0){ // moving down
-                    for (int i = 1; i < Math.abs(vertical); i++){
-                        if(board[colIndex][rowIndex-i].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-                } else if(vertical > 0){ // moving up
-                    for (int i = 1; i < vertical; i++){
-                        if(board[colIndex][rowIndex+i].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-                } else if (horizontal < 0) { // moving left
-                    for (int i = 1; i < Math.abs(horizontal); i++){
-                        if(board[colIndex-i][rowIndex].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-                } else if (horizontal > 0) { // moving right
-                    for (int i = 1; i < horizontal; i++){
-                        if(board[colIndex+i][rowIndex].alive) {
-                            System.out.println("piece blocking path");
-                            return false;
-                        }
-                    }
-
                 } else {
-                    System.out.println("No movement for Queen");
-                    return false;
+                    if (!goodOrthogonalMove(colIndex, rowIndex, vertical, horizontal)) {
+                        System.out.println("No movement for Queen");
+                        return false;
+                    }
                 }
             }
             default ->{
@@ -314,6 +243,51 @@ public class Board {
         // empty current location and place selected at destination
         board[colIndex][rowIndex] = new Piece();
         board[destColIndex][destRowIndex] = selected;
+        return true;
+    }
+
+    private boolean goodDiagonalMove(int colIndex, int rowIndex, int vertical, int horizontal) {
+        int vertIncrement = vertical/Math.abs(vertical);
+        int horIncrement = horizontal/Math.abs(horizontal);
+        for (int vertVal = vertIncrement, horVal =horIncrement; vertVal != vertical && horVal != horizontal; vertVal += vertIncrement, horVal += horIncrement){
+            if (board[colIndex+horVal][rowIndex+vertVal].alive) {
+                System.out.println("piece blocking path");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean goodOrthogonalMove(int colIndex, int rowIndex, int vertical, int horizontal) {
+        if(vertical < 0){ // moving down
+            for (int i = 1; i < Math.abs(vertical); i++){
+                if(board[colIndex][rowIndex-i].alive) {
+                    System.out.println("piece blocking path");
+                    return false;
+                }
+            }
+        } else if(vertical > 0){ // moving up
+            for (int i = 1; i < vertical; i++){
+                if(board[colIndex][rowIndex+i].alive) {
+                    System.out.println("piece blocking path");
+                    return false;
+                }
+            }
+        } else if (horizontal < 0) { // moving left
+            for (int i = 1; i < Math.abs(horizontal); i++){
+                if(board[colIndex-i][rowIndex].alive) {
+                    System.out.println("piece blocking path");
+                    return false;
+                }
+            }
+        } else if (horizontal > 0) {
+            for (int i = 1; i < horizontal; i++){
+                if(board[colIndex+i][rowIndex].alive) {
+                    System.out.println("piece blocking path");
+                    return false;
+                }
+            }
+        }
         return true;
     }
 }
